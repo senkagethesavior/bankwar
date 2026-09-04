@@ -1,0 +1,62 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Default Deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Profil utilisateur : le joueur peut lire son profil.
+    // RÈGLE 7 : Le statut "vérifié" (accountStatus, isVerified, linkedinSub) n'est modifiable que côté serveur (Admin SDK / Backend autoritaire).
+    match /users/{userId} {
+      allow read: if request.auth != null && request.auth.uid == userId;
+      allow create: if request.auth != null && request.auth.uid == userId && 
+        (!request.resource.data.keys().hasAny(['accountStatus', 'isVerified', 'linkedinSub']) || request.resource.data.accountStatus == 'VISITEUR');
+      allow update: if request.auth != null && request.auth.uid == userId && 
+        !request.resource.data.diff(resource.data).affectedKeys().hasAny(['accountStatus', 'isVerified', 'linkedinSub', 'verifiedAt']);
+      allow delete: if false;
+    }
+
+    // Établissement bancaire : lecture autorisée (privée pour les joueurs, publique pour les données de marché).
+    // RÈGLE 6.4 : AUCUNE écriture client sur un document is_ai: true.
+    // Toute mutation passe par le backend Express autoritaire.
+    match /institutions/{institutionId} {
+      allow read: if request.auth != null && (resource.data.is_ai == true || resource.data.ownerId == request.auth.uid);
+      allow write: if false; // Zero-Trust : aucune écriture client directe
+    }
+
+    // Établissements IA : infrastructure de marché gérée exclusivement par le serveur
+    match /ai_institutions/{aiId} {
+      allow read: if request.auth != null;
+      allow write: if false; // Interdiction absolue de toute écriture client sur les IA
+    }
+
+    // Marchés partagés en temps réel : lecture publique pour tous les joueurs authentifiés.
+    // Écriture réservée au serveur autoritaire.
+    match /markets/{zoneId} {
+      allow read: if request.auth != null;
+      allow write: if false;
+    }
+
+    // Classements en direct : lecture publique pour tous les joueurs authentifiés.
+    // Écriture réservée au serveur autoritaire.
+    match /rankings/{zoneId} {
+      allow read: if request.auth != null;
+      allow write: if false;
+    }
+
+    // Journal d'audit append-only des décisions : lecture par le propriétaire de l'établissement.
+    // Écriture réservée au serveur autoritaire.
+    match /decisions_journal/{logId} {
+      allow read: if request.auth != null && resource.data.userId == request.auth.uid;
+      allow write: if false;
+    }
+
+    // Discussions et messages communautaires : lecture pour tous les authentifiés, création validée
+    match /community_messages/{msgId} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null && request.resource.data.senderId == request.auth.uid;
+      allow update, delete: if false;
+    }
+  }
+}

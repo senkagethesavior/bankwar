@@ -1,0 +1,8 @@
+{
+  "name": "Remix BANK WAR",
+  "description": "Jeu de simulation bancaire et de trading en Afrique (UEMOA, CEMAC, Zone générique). Dirigez une banque commerciale ou une microfinance, affrontez les marchés et le régulateur.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

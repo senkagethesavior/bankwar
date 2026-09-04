@@ -1,0 +1,84 @@
+{
+  "entities": {
+    "UserProfile": {
+      "collection": "users",
+      "fields": {
+        "userId": { "type": "string", "description": "Firebase Auth UID" },
+        "email": { "type": "string" },
+        "displayName": { "type": "string" },
+        "photoURL": { "type": "string" },
+        "createdAt": { "type": "string" },
+        "institutionId": { "type": "string" },
+        "accountStatus": { "type": "string", "enum": ["VISITEUR", "DIRIGEANT_VERIFIE"] },
+        "isVerified": { "type": "boolean" },
+        "linkedinSub": { "type": "string" },
+        "linkedinProfileUrl": { "type": "string" },
+        "publicLinkedInOptIn": { "type": "boolean" },
+        "isCampusAccount": { "type": "boolean" },
+        "campusCode": { "type": "string" }
+      }
+    },
+    "Institution": {
+      "collection": "institutions",
+      "fields": {
+        "id": { "type": "string", "description": "Unique institution ID" },
+        "ownerId": { "type": "string", "description": "Owner player user ID" },
+        "name": { "type": "string" },
+        "country": { "type": "string" },
+        "zone": { "type": "string", "enum": ["UEMOA", "CEMAC", "AUTRE_AFRIQUE"] },
+        "type": { "type": "string", "enum": ["COMMERCIAL_BANK", "MICROFINANCE"] },
+        "difficulty": { "type": "string" },
+        "strategicModel": { "type": "string" },
+        "currentYear": { "type": "number" },
+        "currentQuarter": { "type": "number" },
+        "realDaysElapsed": { "type": "number" },
+        "balanceSheet": { "type": "object" },
+        "prudentialRatios": { "type": "object" },
+        "lastIncomeStatement": { "type": "object" },
+        "activeLoans": { "type": "array" },
+        "pendingLoanApplications": { "type": "array" },
+        "bankCoins": { "type": "number" },
+        "expertiseTokens": { "type": "number" },
+        "reputationScore": { "type": "number" },
+        "eloRating": { "type": "number" },
+        "isInProvisionalAdministration": { "type": "boolean" },
+        "isLicenseRevoked": { "type": "boolean" }
+      }
+    },
+    "Markets": {
+      "collection": "markets",
+      "fields": {
+        "zone": { "type": "string" },
+        "creditWindows": { "type": "array" },
+        "interbankOrderBook": { "type": "array" },
+        "publicBondAuctions": { "type": "array" },
+        "lastUpdated": { "type": "string" }
+      }
+    },
+    "Rankings": {
+      "collection": "rankings",
+      "fields": {
+        "zone": { "type": "string" },
+        "leaderboard": { "type": "array" },
+        "season": { "type": "number" },
+        "lastQuarterUpdate": { "type": "string" }
+      }
+    },
+    "AuditJournal": {
+      "collection": "decisions_journal",
+      "fields": {
+        "id": { "type": "string" },
+        "institutionId": { "type": "string" },
+        "userId": { "type": "string" },
+        "decisionType": { "type": "string" },
+        "payload": { "type": "object" },
+        "regulatoryValidation": { "type": "object" },
+        "timestamp": { "type": "string" }
+      }
+    }
+  },
+  "securityRoles": {
+    "server": "All state mutations and simulation tick updates are executed strictly server-side.",
+    "player": "Authenticated player can read own institution and public market/rankings data. No direct writes to game state."
+  }
+}
